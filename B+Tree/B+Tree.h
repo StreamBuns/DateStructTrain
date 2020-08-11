@@ -212,6 +212,12 @@ bool BPTree::Insert(const int&x){
 Triple BPTree::Search (const int& x) {
     Triple result;
     //GetNode(root);
+//    if(x==90){
+//        result.i=3;
+//        result.r=root->ptr[2];
+//        result.tag=1;
+//        return result;
+//    }
     BPTreeNode *p = root, *q = NULL;
     int i = 0;
     while (p != NULL){
