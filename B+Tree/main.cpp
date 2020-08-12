@@ -17,8 +17,8 @@ int main(int argc, const char * argv[]) {
     bp->Insert(72);
     bp->Insert(53);
      bp->Insert(63);
-    bp->Insert(71);
-//     bp->Insert(90);
+//    bp->Insert(71);
+     bp->Insert(90);
 //     bp->Insert(88);
 //    bp->Insert(15);
     bp->Travelsal();
