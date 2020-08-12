@@ -14,6 +14,9 @@
 #define m 4
 #include <iostream>
 using namespace std;
+/*
+ *子节点的数据结构
+ */
 struct BPTreeNode
 {
     int n; //关键码的数量
@@ -35,7 +38,9 @@ struct BPTreeNode
 };
 //---------------------------------------------------------------------------------
 //2020年 8月11日 星期二 16时59分15秒 CST
-
+/*
+*Search()函数返回值的数据结构
+*/
 struct Triple
 {
     BPTreeNode * r;//节点地址指针
@@ -44,7 +49,9 @@ struct Triple
     //tag=0,搜索成功，tag=1,搜索不成功
 };
 //---------------------------------------------------------------------------------
-
+/*
+ *B+数定义
+ */
 class BPTree
 {
 private:
@@ -78,12 +85,13 @@ public:
         }
     
     }
-};
+};//用来测试插入成功与否
 
 
 //---------------------------------------------------------------------------------
-//Created by 赵桐 on 2020年 8月11日 星期二 16时59分15秒 CST
 /*
+*void insertKey(BPTreeNode* p,int j,int k,BPTreeNode* ap)
+*Created by 赵桐 on 2020年 8月11日 星期二 16时59分15秒 CST
 *把关键码k插入到p的key[j+1]的位置，需要先把后面的移动一个然后再插入
 *同理也是把ap插入到p的ptr[j+1]的位置
 */
@@ -99,9 +107,9 @@ void insertKey(BPTreeNode* p,int j,int k,BPTreeNode* ap){
     p->n++;
 }
 //---------------------------------------------------------------------------------
-//Created by 赵桐 on 2020年 8月11日 星期二 16时59分15秒 CST
 /*
-*分裂函数
+*void move(BPTreeNode*p,BPTreeNode*q,int s,int x )分裂函数
+*Created by 赵桐 on 2020年 8月11日 星期二 16时59分15秒 CST
 *把p的右指针指向新分裂出来的q
 *把p的key[s+2,m+1]移动到q的key[1,s]
 *把p的ptr[s+1,m+1]移动到q的key[0,s]
@@ -120,13 +128,12 @@ void move(BPTreeNode*p,BPTreeNode*q,int s,int x ){
     q->n=x-s;
 }
 //---------------------------------------------------------------------------------
-//Created by 赵桐 on 2020年 8月11日 星期二 16时59分15秒 CST
 /*
-*分裂函数
-*把p的右指针指向新分裂出来的q
-*把p的key[s+2,m+1]移动到q的key[1,s]
-*把p的ptr[s+1,m+1]移动到q的key[0,s]
-*p->n变为s+1，q->n变为m-s
+*bool Insert(const int&x)插入函数
+*Created by 赵桐 on 2020年 8月11日 星期二 16时59分15秒 CST
+*把x插入到最符合它的那个地方，如果插入的子节点的key的个数大于m则进行分裂
+*把q分裂形成p，q，分别有「m+1/2 个 和 m+1/2」个
+*然后把分裂形成的p，q子节点的最大值添加进父节点
 */
 //---------------------------------------------------------------------------------
 bool BPTree::Insert(const int&x){
@@ -246,5 +253,19 @@ Triple BPTree::Search (const int& x) {
     result.tag = 1;
     return result;//搜索失败，返回插入位置
                   //x可能落入的区间K[i]与K[i+1]
+}
+//---------------------------------------------------------------------------------
+/*
+*bool remove ( const int& x );
+*
+*create by 赵桐 Create on 2020年 8月12日 星期三 08时14分46秒 CST
+*
+*用x关键码搜索如果找到了就把相应的key值的数据节点进行删除
+*
+*/
+//---------------------------------------------------------------------------------
+bool BPTree::Remove(const int&){
+    
+    return true;
 }
 #endif /* B_Tree_h */
