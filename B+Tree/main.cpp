@@ -19,9 +19,14 @@ int main(int argc, const char * argv[]) {
      bp->Insert(63);
 //    bp->Insert(71);
      bp->Insert(90);
-//     bp->Insert(88);
-//    bp->Insert(15);
+     bp->Insert(88);
+    bp->Insert(15);
+    bp->Insert(10);
+//    bp->Insert(91);
+    bp->Insert(44);
+    bp->Insert(68);
     bp->Travelsal();
+
 //    int n=4;
 //    int array[m+1];
 //
