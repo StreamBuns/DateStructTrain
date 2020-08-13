@@ -272,6 +272,7 @@ Triple BPTree::Search (const int& x)
         {
             while (p != NULL)
             {
+
                 p = p->ptr[p->n]; //如果在非叶子节点找到等于x的key值
                 //直接遍历叶子结点
                 i = p->n;         //更新i使其等于n
@@ -311,51 +312,61 @@ Triple BPTree::Search (const int& x)
 //---------------------------------------------------------------------------------
 void compress(BPTreeNode* p , int j){
     int x=j+1;
-    for(int i=0;i<p->n-j-1;i++){
-
+    for(int i=p->n;i>j;i--){
+        p->key[i-1]=p->key[i];
     }
+    p->n--;
 }
-//void LeftAdjust(BPTreeNode* p,BPTreeNode *q,int d, int j){
-//
-//}
-//void RightAdjust(BPTreeNode* p,BPTreeNode *q,int d, int j){
-//
-//}
-//bool BPTree::Remove(const int&x){
+void LeftAdjust(BPTreeNode* p,BPTreeNode *q,int d, int j){
+    
+    BPTreeNode * pl = q->right;
+}
+void RightAdjust(BPTreeNode* p,BPTreeNode *q,int d, int j){
+
+}
+bool BPTree::Remove(const int&x){
 //    Triple loc = Search(x);
 //    if(loc.tag==1)return false;
 //    BPTreeNode *p=loc.r,*q,*s;
 //    int j = loc.i,k=p->key[p->n];
-////    if(p->ptr[j]!=NULL){
-////
-////    }
-////    else compress(p, j);
+    
+    Triple loc;
+        BPTreeNode *p=root->ptr[0],*q,*s;
+        int j = 3,k=p->key[p->n];
+    
+    if(x==p->key[p->n]&&p->parent!=NULL){
+        compress(p, j);
+        int i=0;
+        while(p->parent->ptr[i]!=p)i++;
+        p->parent->key[i+1]=p->key[p->n];
+    }
+    else compress(p, j);
 //    compress(p, j);
-//
-//    int d = (m+1)/2;
-//    while(1){
-//        if(p->n<d-1){
-//            j=0;q=p->parent;
-////            GetNode(q);
+
+    int d = (m+1)/2;
+    while(1){
+        if(p->n<d-1){
+            j=0;q=p->parent;
+//            GetNode(q);
+            while(j<=q->n&&q->ptr[j]!=p)j++;
+            if(j==0)LeftAdjust( p, q, d, j);
+            else RightAdjust( p, q, d, j);
+//            GetNode(q);
 //            while(j<=q->n&&q->ptr[j]!=p)j++;
-//            if(j==0)LeftAdjust( p, q, d, j);
-//            else RightAdjust( p, q, d, j);
-////            GetNode(q);
-////            while(j<=q->n&&q->ptr[j]!=p)j++;
-////            if(j==0)LeftAdjust(p, q, d, j);
-////            else RightAdjust(p, q, d, j);
-//            p=q;
-//            if(p==root)break;
-//        }
-//        else break;
-//    }
-//    if(root->n == 0){
-//        p=root->ptr[0];
-//        delete root;root = p;
-//        root->parent=NULL;
-//    }
-//    return true;
-//}
+//            if(j==0)LeftAdjust(p, q, d, j);
+//            else RightAdjust(p, q, d, j);
+            p=q;
+            if(p==root)break;
+        }
+        else break;
+    }
+    if(root->n == 0){
+        p=root->ptr[0];
+        delete root;root = p;
+        root->parent=NULL;
+    }
+    return true;
+}
 //*************************************************************************************
 //void tiaozheng(BPTreeNode *p,const int&x)
 //{
