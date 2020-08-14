@@ -244,62 +244,64 @@ bool BPTree::Insert(const int&x){
 *
 */
 //---------------------------------------------------------------------------------
-Triple BPTree::Search (const int& x)
+Triple BPTree::Search(const int &x)
 {
     Triple result;
     //GetNode(root);
-//    if(x==90){
-//        result.i=3;
-//        result.r=root->ptr[2];
-//        result.tag=1;
-//        return result;
-//    }
+    //    if(x==90){
+    //        result.i=3;
+    //        result.r=root->ptr[2];
+    //        result.tag=1;
+    //        return result;
+    //    }
     BPTreeNode *p = root, *q = NULL;
     int i = 0;
     while (p != NULL)
     {
         i = 0;
 
-//        cout <<p->n << " ";
-        p->key[p->n+1] = MaxValue;
+        //        cout <<p->n << " ";
+        p->key[p->n + 1] = MaxValue;
         //将Key值最大的后一个Key值设为MaxValue
-//        {
-//            i++;
-//        }
-        while ( p->key[i + 1] < x )//以防止找不到相应的小于x的Key值while ( p->key[i + 1] < x )
+        //        {
+        //            i++;
+        //        }
+        while (p->key[i + 1] < x) //以防止找不到相应的小于x的Key值while ( p->key[i + 1] < x )
             i++;
         if (p->key[i + 1] == x)
         {
-            while (p != NULL)
+            if (p->ptr[i] != NULL)
             {
-
-                p = p->ptr[p->n]; //如果在非叶子节点找到等于x的key值
-                //直接遍历叶子结点
-                i = p->n;         //更新i使其等于n
+                p = p->ptr[i];
+                while (p != NULL)
+                {
+                    result.r = p;
+                    i = p->n;     //更新i使其等于n
+                    p = p->ptr[p->n-1]; //如果在非叶子节点找到等于x的key值
+                    //直接遍历叶子结点
+                }
             }
-            result.r = p;
-            result.i = i + 1;
+           
+            result.i = i;
             result.tag = 0;
             return result;
         }
         q = p;
-        if(i == p->n)
-        {
-            p = p->ptr[i-1];
-        }
+
+        if (i == p->n)
+            p = p->ptr[i - 1];
         else
-        {
             p = p->ptr[i];
-        }
 
         //GetNode(p);
     }
     result.r = q;
     result.i = i;
     result.tag = 1;
-    return result;//搜索失败，返回插入位置
+    return result; //搜索失败，返回插入位置
     //x可能落入的区间K[i]与K[i+1]
 }
+
 //---------------------------------------------------------------------------------
 /*
 *bool remove ( const int& x );
@@ -311,28 +313,87 @@ Triple BPTree::Search (const int& x)
 */
 //---------------------------------------------------------------------------------
 void compress(BPTreeNode* p , int j){
-    int x=j+1;
     for(int i=p->n;i>j;i--){
         p->key[i-1]=p->key[i];
     }
     p->n--;
 }
+void merge(BPTreeNode* p,BPTreeNode *q, BPTreeNode*pl,int j){
+    int i=0;
+    for(i=1;i<=pl->n;i++){
+        q->key[q->n+1]=pl->key[pl->n];
+        q->n++;
+        }
+        q->right = pl->right;
+    for(int i=j+1;i<p->n;i++){
+        p->key[i]=p->key[i+1];
+    }
+    p->n=q->key[q->n];
+//    delete ;
+}
 void LeftAdjust(BPTreeNode* p,BPTreeNode *q,int d, int j){
     
-    BPTreeNode * pl = q->right;
+    BPTreeNode * pl = p->right;
+    if((pl->n+p->n)<=m){
+//        merge(p,q,pl,j);
+        int i=0;
+        for(i=1;i<=pl->n;i++){
+            p->key[p->n+1]=pl->key[i];
+            p->n++;
+            }
+            p->right = pl->right;
+        for(int i=j+1;i<q->n;i++){
+            q->key[i]=q->key[i+1];
+            q->ptr[i]=q->ptr[i+1];
+        }
+        q->key[j+1]=p->key[p->n];
+        q->n--;
+    }
+    else{
+//        int i = (p->n+pl->n+1)/2;
+        int k=d;
+        for(int i=0;i<=d-1;i++){
+            p->key[k++]=pl->key[i+1];
+            p->n++;
+        }
+//        p->n=d+1;
+        k=1;
+        for(int i=d+1;i<=pl->n;i++){
+            pl->key[k++]=pl->key[i];
+        }
+        pl->n=d;
+        q->key[j+1]=p->key[p->n];
+    }
 }
 void RightAdjust(BPTreeNode* p,BPTreeNode *q,int d, int j){
-
+        BPTreeNode * pl = q->right;
+        if((pl->n+q->n)<=m){
+            merge(p,q,pl,j);
+        }
+        else{
+    //      int i = (p->n+pl->n+1)/2;
+            int k=d;
+            for(int i=0;i<d-1;i++){
+                q->key[k++]=pl->key[i+1];
+            }
+            q->n=d+1;
+            k=1;
+            for(int i=d;i<=pl->n;i++){
+                pl->key[k++]=pl->key[i];
+            }
+            pl->n=d;
+            p->key[j]=q->key[q->n];
+        }
 }
 bool BPTree::Remove(const int&x){
-//    Triple loc = Search(x);
-//    if(loc.tag==1)return false;
-//    BPTreeNode *p=loc.r,*q,*s;
-//    int j = loc.i,k=p->key[p->n];
+    Triple loc = Search(x);
+    if(loc.tag==1)return false;
+    BPTreeNode *p=loc.r,*q,*s;
+    int j = loc.i,k=p->key[p->n];
     
-    Triple loc;
-        BPTreeNode *p=root->ptr[0],*q,*s;
-        int j = 3,k=p->key[p->n];
+//    Triple loc;
+//        BPTreeNode *p=root->ptr[0],*q,*s;
+//        int j = 3,k=p->key[p->n];
     
     if(x==p->key[p->n]&&p->parent!=NULL){
         compress(p, j);
@@ -345,7 +406,7 @@ bool BPTree::Remove(const int&x){
 
     int d = (m+1)/2;
     while(1){
-        if(p->n<d-1){
+        if(p->n<d){
             j=0;q=p->parent;
 //            GetNode(q);
             while(j<=q->n&&q->ptr[j]!=p)j++;
@@ -360,7 +421,7 @@ bool BPTree::Remove(const int&x){
         }
         else break;
     }
-    if(root->n == 0){
+    if(root->n == 1){
         p=root->ptr[0];
         delete root;root = p;
         root->parent=NULL;
