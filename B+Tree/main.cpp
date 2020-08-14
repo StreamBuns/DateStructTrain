@@ -18,10 +18,14 @@ int main(int argc, const char * argv[]) {
     bp->Insert(39);
     bp->Insert(72);
     bp->Insert(53);
-//    bp->Insert(54);
-//    bp->Insert(55);
+//    bp->Remove(53);
 //    bp->Remove(39);
 //    bp->Remove(24);
+//    bp->Remove(01);
+//    bp->Remove(72);
+//    bp->Insert(54);
+//    bp->Insert(55);
+//
 //    bp->Insert(39);
      bp->Insert(63);
 //    bp->Insert(71);

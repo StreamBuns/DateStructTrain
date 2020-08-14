@@ -215,7 +215,7 @@ bool BPTree::Insert(const int&x){
         k=k1;
         p=t;
     }
-    else{
+    else{                                      //第一次没有父节点，创建一个父节点然后把pq加进去
         root = new BPTreeNode();
         root->n=2;                           //加入两个key
         root->parent=NULL;                   //创建新的根
@@ -276,15 +276,21 @@ Triple BPTree::Search(const int &x)
                 while (p != NULL)
                 {
                     result.r = p;
-                    i = p->n;     //更新i使其等于n
-                    p = p->ptr[p->n-1]; //如果在非叶子节点找到等于x的key值
+                    i = p->n;             //更新i使其等于n
+                    p = p->ptr[p->n - 1]; //如果在非叶子节点找到等于x的key值
                     //直接遍历叶子结点
                 }
+                result.i = i;
+                result.tag = 0;
+                return result;
             }
-           
-            result.i = i;
-            result.tag = 0;
-            return result;
+            else
+            {
+                result.r = p;
+                result.i = i+1;
+                result.tag = 0;
+                return result;
+            }
         }
         q = p;
 
@@ -302,40 +308,39 @@ Triple BPTree::Search(const int &x)
     //x可能落入的区间K[i]与K[i+1]
 }
 
+
 //---------------------------------------------------------------------------------
 /*
-*bool remove ( const int& x );
+*Remove()函数的辅助函数bool compress(BPTreeNode* p , int j);
 *
 *create by 赵桐 Create on 2020年 8月12日 星期三 08时14分46秒 CST
 *
-*用x关键码搜索如果找到了就把相应的key值的数据节点进行删除
+*主要功能就是把叶节点的key值直接删除，直接删除之前需要把叶节点的值往前搬动，以保证时时刻刻都是处在平衡状态
 *
 */
 //---------------------------------------------------------------------------------
 void compress(BPTreeNode* p , int j){
     for(int i=p->n;i>j;i--){
-        p->key[i-1]=p->key[i];
+        p->key[i-1]=p->key[i];          //从删除的位置往前搬
     }
-    p->n--;
+    p->n--;                             //删除了就把原来的关键码的个数减少一个
 }
-void merge(BPTreeNode* p,BPTreeNode *q, BPTreeNode*pl,int j){
-    int i=0;
-    for(i=1;i<=pl->n;i++){
-        q->key[q->n+1]=pl->key[pl->n];
-        q->n++;
-        }
-        q->right = pl->right;
-    for(int i=j+1;i<p->n;i++){
-        p->key[i]=p->key[i+1];
-    }
-    p->n=q->key[q->n];
-//    delete ;
-}
+//---------------------------------------------------------------------------------
+/*
+*最左边的子树的调整void LeftAdjust(BPTreeNode* p,BPTreeNode *q,int d, int j);
+*
+*create by 赵桐 Create on 2020年 8月12日 星期三 08时14分46秒 CST
+*
+*当左边删除完了关键码的个数小于d就是把节点p中的值进行调整，
+*首先是如果左边p与右边pl的关键码个数加起来小于m的时候，直接两个节点合并
+*其次是如果加起来大与m的时候，直接把右节点中部分个值给左边节点，然后把右边节点后面的key值搬到前面形成平衡树
+*/
+//---------------------------------------------------------------------------------
 void LeftAdjust(BPTreeNode* p,BPTreeNode *q,int d, int j){
     
-    BPTreeNode * pl = p->right;
+    BPTreeNode * pl = p->right;       //pl是p同父亲的右边的子树
     if((pl->n+p->n)<=m){
-//        merge(p,q,pl,j);
+                                //如果p的关键码的个数与pl的关键码的个数加起来小于等于m那么直接合并
         int i=0;
         for(i=1;i<=pl->n;i++){
             p->key[p->n+1]=pl->key[i];
@@ -348,15 +353,16 @@ void LeftAdjust(BPTreeNode* p,BPTreeNode *q,int d, int j){
         }
         q->key[j+1]=p->key[p->n];
         q->n--;
+        delete pl;
     }
     else{
-//        int i = (p->n+pl->n+1)/2;
+
         int k=d;
         for(int i=0;i<=d-1;i++){
             p->key[k++]=pl->key[i+1];
             p->n++;
         }
-//        p->n=d+1;
+
         k=1;
         for(int i=d+1;i<=pl->n;i++){
             pl->key[k++]=pl->key[i];
@@ -365,35 +371,72 @@ void LeftAdjust(BPTreeNode* p,BPTreeNode *q,int d, int j){
         q->key[j+1]=p->key[p->n];
     }
 }
+//---------------------------------------------------------------------------------
+/*
+*非最左边的子树的调整void RightAdjust(BPTreeNode* p,BPTreeNode *q,int d, int j)
+*
+*create by 赵桐 Create on 2020年 8月12日 星期三 08时14分46秒 CST
+*
+*原理与最左边的子树调整类似，不过是左右互换。
+*这个p不是必定不是q的ptr[0]所以只要整一个pl=p的左边节点
+*然后pl与p互换就能复用最左树调整的代码
+*
+*/
+//---------------------------------------------------------------------------------
 void RightAdjust(BPTreeNode* p,BPTreeNode *q,int d, int j){
-        BPTreeNode * pl = q->right;
-        if((pl->n+q->n)<=m){
-            merge(p,q,pl,j);
-        }
-        else{
-    //      int i = (p->n+pl->n+1)/2;
-            int k=d;
-            for(int i=0;i<d-1;i++){
-                q->key[k++]=pl->key[i+1];
+    BPTreeNode * pl = q->ptr[j-1],*temp;
+    temp=pl;
+    pl=p;
+    p=temp;
+       if((pl->n+p->n)<=m){
+
+                int i=0;
+                for(i=1;i<=pl->n;i++){
+                    p->key[p->n+1]=pl->key[i];
+                    p->n++;
+                    }
+                    p->right = pl->right;
+                for(int i=j+1;i<q->n;i++){
+                    q->key[i]=q->key[i+1];
+                    q->ptr[i]=q->ptr[i+1];
+                }
+                q->key[j+1]=p->key[p->n];
+                q->n--;
+           delete pl;
             }
-            q->n=d+1;
-            k=1;
-            for(int i=d;i<=pl->n;i++){
-                pl->key[k++]=pl->key[i];
+            else{
+
+                int k=d;
+                for(int i=0;i<=d-1;i++){
+                    p->key[k++]=pl->key[i+1];
+                    p->n++;
+                }
+
+                k=1;
+                for(int i=d+1;i<=pl->n;i++){
+                    pl->key[k++]=pl->key[i];
+                }
+                
+                pl->n=d;
+                q->key[j+1]=p->key[p->n];
             }
-            pl->n=d;
-            p->key[j]=q->key[q->n];
-        }
 }
+//---------------------------------------------------------------------------------
+/*
+*bool remove ( const int& x );
+*
+*create by 赵桐 Create on 2020年 8月12日 星期三 08时14分46秒 CST
+*
+*用x关键码搜索如果找到了就把相应的key值的数据节点进行删除
+*
+*/
+//---------------------------------------------------------------------------------
 bool BPTree::Remove(const int&x){
     Triple loc = Search(x);
     if(loc.tag==1)return false;
-    BPTreeNode *p=loc.r,*q,*s;
-    int j = loc.i,k=p->key[p->n];
+    BPTreeNode *p=loc.r,*q;
+    int j = loc.i;
     
-//    Triple loc;
-//        BPTreeNode *p=root->ptr[0],*q,*s;
-//        int j = 3,k=p->key[p->n];
     
     if(x==p->key[p->n]&&p->parent!=NULL){
         compress(p, j);
@@ -402,7 +445,7 @@ bool BPTree::Remove(const int&x){
         p->parent->key[i+1]=p->key[p->n];
     }
     else compress(p, j);
-//    compress(p, j);
+
 
     int d = (m+1)/2;
     while(1){
@@ -412,10 +455,6 @@ bool BPTree::Remove(const int&x){
             while(j<=q->n&&q->ptr[j]!=p)j++;
             if(j==0)LeftAdjust( p, q, d, j);
             else RightAdjust( p, q, d, j);
-//            GetNode(q);
-//            while(j<=q->n&&q->ptr[j]!=p)j++;
-//            if(j==0)LeftAdjust(p, q, d, j);
-//            else RightAdjust(p, q, d, j);
             p=q;
             if(p==root)break;
         }
@@ -428,81 +467,4 @@ bool BPTree::Remove(const int&x){
     }
     return true;
 }
-//*************************************************************************************
-//void tiaozheng(BPTreeNode *p,const int&x)
-//{
-//
-//        while(p!=NULL)
-//        {
-//
-//            p=p->parent;
-//            for(int z=1;z<=p->n;z++)
-//            {
-//
-//                if(p->key[z]!=(p->ptr[z-1]->key[p->ptr[z-1]->n]))
-//                {
-//
-//                    p->key[z]=x;
-//
-//                 if(z!=p->n)
-//                   break;//如果删除不是最后一个关键吗直接break
-//                }
-//
-//             }
-//          }
-//}
-//bool BPTree::Remove(const int&x){
-//    Triple loc = Search(x);
-//    if(loc.tag==1)return false;
-//    BPTreeNode *p=loc.r;
-//
-//
-//    while(1)
-//    {
-//         if((p->n)>(m+1)/2)
-//         {
-//
-//             compress(p,loc.i);
-//             p->n--;
-//             tiaozheng(p,x);
-//
-//         }
-//         else
-//         {
-//
-//             if((p->right->n)>(m+1)/2)
-//              {
-//                compress(p,loc.i);
-//                p->key[p->n]=p->right->key[1];
-//                compress(p->right,1);
-//                p->right->n--;
-//                tiaozheng(p,x);
-//
-//              }
-//              else
-//              {
-//
-//                  compress(p,loc.i);
-//                  p->n--;
-//
-//                  //现在应该讲左边的关键码插入右边的节点中
-//                  BPTreeNode *r=p->right;
-//
-//                  for(int z=r->n;z>0;z--)
-//                  {
-//
-//                      r->key[z+(p->n)]=r->key[z];
-//                  }
-//                  for(int z=1;z<=(p->n);z++)
-//                  {
-//
-//                      r->key[z]=p->key[z];
-//                  }
-//
-//              }
-//
-//    }
-//
-//    return true;
-//}
 #endif /* B_Tree_h */
