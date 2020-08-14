@@ -342,12 +342,12 @@ void LeftAdjust(BPTreeNode* p,BPTreeNode *q,int d, int j){
     if((pl->n+p->n)<=m){
                                 //如果p的关键码的个数与pl的关键码的个数加起来小于等于m那么直接合并
         int i=0;
-        for(i=1;i<=pl->n;i++){
+        for(i=1;i<=pl->n;i++){       //这个循环把右节点的数据传送到左节点
             p->key[p->n+1]=pl->key[i];
             p->n++;
             }
             p->right = pl->right;
-        for(int i=j+1;i<q->n;i++){
+        for(int i=j+1;i<q->n;i++){     //这个循环把父节点上面的p q合并为一个
             q->key[i]=q->key[i+1];
             q->ptr[i]=q->ptr[i+1];
         }
@@ -356,19 +356,21 @@ void LeftAdjust(BPTreeNode* p,BPTreeNode *q,int d, int j){
         delete pl;
     }
     else{
-
+                                        //如果此节点跟右边的节点大于1，就需要把右边节点的部分数据
+                                        //移动到左节点宏观上实现，“先合并再分裂”微观实现其实只需要
+                                        //移动右节点部分数据，然后把后面的数据挪到前面去
         int k=d;
-        for(int i=0;i<=d-1;i++){
+        for(int i=0;i<=d-1;i++){        //移动部分数据到左节点
             p->key[k++]=pl->key[i+1];
             p->n++;
         }
 
         k=1;
-        for(int i=d+1;i<=pl->n;i++){
+        for(int i=d+1;i<=pl->n;i++){    //把后面的数据挪到前面去形成平衡素好
             pl->key[k++]=pl->key[i];
         }
         pl->n=d;
-        q->key[j+1]=p->key[p->n];
+        q->key[j+1]=p->key[p->n];       //把父节点上左节点的最大值改成现在的最大值
     }
 }
 //---------------------------------------------------------------------------------
@@ -433,12 +435,13 @@ void RightAdjust(BPTreeNode* p,BPTreeNode *q,int d, int j){
 //---------------------------------------------------------------------------------
 bool BPTree::Remove(const int&x){
     Triple loc = Search(x);
-    if(loc.tag==1)return false;
+    if(loc.tag==1)return false;        //找不到就返回
     BPTreeNode *p=loc.r,*q;
     int j = loc.i;
     
     
-    if(x==p->key[p->n]&&p->parent!=NULL){
+    if(x==p->key[p->n]&&p->parent!=NULL){  //如果不是p里最大的数或者没有父母直接删除
+                                    //否则，删除完p以后需要把父母里面的p的最大值更改为现在的最大值
         compress(p, j);
         int i=0;
         while(p->parent->ptr[i]!=p)i++;
@@ -448,19 +451,20 @@ bool BPTree::Remove(const int&x){
 
 
     int d = (m+1)/2;
-    while(1){
+    while(1){                           //如果个数小余d那就从下面叶节点循环往上面更改
         if(p->n<d){
             j=0;q=p->parent;
 //            GetNode(q);
             while(j<=q->n&&q->ptr[j]!=p)j++;
-            if(j==0)LeftAdjust( p, q, d, j);
-            else RightAdjust( p, q, d, j);
+            if(j==0)LeftAdjust( p, q, d, j);       //如果是最左边的子孩子就与右边的孩子调整
+            else RightAdjust( p, q, d, j);          //如果不是最左边的孩子，就与左边的孩子进行调整
             p=q;
             if(p==root)break;
         }
         else break;
     }
-    if(root->n == 1){
+    if(root->n == 1){                               //如果父母的关键码个数==1
+                                                    //那就取消这一层
         p=root->ptr[0];
         delete root;root = p;
         root->parent=NULL;
