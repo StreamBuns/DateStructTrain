@@ -22,7 +22,7 @@ struct BPTreeNode
     int n; //关键码的数量
     BPTreeNode * parent;//父结点指针
     int key[m+2];//Key[0]未用
-    BPTreeNode * ptr[m+2];//子树结点指针数组，ptr[m]在一出事使用
+    BPTreeNode * ptr[ m+2];//子树结点指针数组，ptr[m]在一出事使用
     BPTreeNode * right;//B+树叶结点指向右边相邻叶结点
     int * recptr[m+1];//每个索引项中指向数据区相应记录起始地址的指针
     BPTreeNode(){
