@@ -11,9 +11,26 @@
 
 
 #define MaxValue 2000000
-#define m 4
+#define m 199
 #include <iostream>
 using namespace std;
+
+struct StuDate{
+    string strName;
+    string strSex;
+    void Set(string strName,string strSex){
+        this->strName=strName;
+        this->strSex = strSex;
+    }
+    StuDate(StuDate const &stu){
+        this->strName=stu.strName;
+        this->strSex =stu.strSex;
+    }
+    StuDate(){
+        this->strName="";
+        this->strSex ="";
+    }
+};
 /*
  *子节点的数据结构
  */
@@ -24,15 +41,17 @@ struct BPTreeNode
     int key[m+2];//Key[0]未用
     BPTreeNode * ptr[ m+2];//子树结点指针数组，ptr[m]在一出事使用
     BPTreeNode * right;//B+树叶结点指向右边相邻叶结点
-    int * recptr[m+1];//每个索引项中指向数据区相应记录起始地址的指针
+    StuDate * recptr[m+2];//每个索引项中指向数据区相应记录起始地址的指针
     BPTreeNode(){
         n=0;
         parent=NULL;
         for(int i=1;i<=m+1;i++){
             key[i]=MaxValue;
             ptr[i-1]=NULL;
+            recptr[i-1]=NULL;
         }
         ptr[m+1]=NULL;
+        recptr[m+1]=NULL;
         right = NULL;
     }
 };
@@ -57,13 +76,15 @@ class BPTree
 private:
     BPTreeNode * root;//根指针
     BPTreeNode * sqt;
+    Triple Search(const int& x);//搜索
+    BPTreeNode* Insert(const int& x);//插入关键码x
+
 public:
     BPTree(){
         root = NULL;
         sqt = NULL;
     };//构造函数
-    Triple Search(const int& x);//搜索
-    bool Insert(const int& x);//插入关键码x
+    bool Insert(const int& x , StuDate stu);
     bool Remove(const int& x);//删除关键码x
     void Travelsal(){
 //        BPTreeNode * q = root,*p;
@@ -80,14 +101,12 @@ public:
         int i=0;
         while(p!=NULL){
             for(i=1;i<=p->n;i++)
-                std::cout<<p->key[i]<<std::endl;
+                std::cout<<p->key[i]<< " " <<p->recptr[i-1]->strName<<" "<<p->recptr[i-1]->strSex<<std::endl;
             p=p->right;
         }
     
     }
 };//用来测试插入成功与否
-
-
 //---------------------------------------------------------------------------------
 /*
 *void insertKey(BPTreeNode* p,int j,int k,BPTreeNode* ap)
@@ -95,7 +114,31 @@ public:
 *把关键码k插入到p的key[j+1]的位置，需要先把后面的移动一个然后再插入
 *同理也是把ap插入到p的ptr[j+1]的位置
 */
-void insertKey(BPTreeNode* p,int j,int k,BPTreeNode* ap){
+//bool BPTree::Insert(const int& x , string strName,string strSex){
+//    BPTreeNode *p = Insert(x);
+//    if(p==NULL){
+//        return false;
+//    }
+//    string  *Name,*Sex,**strArray = nullptr;
+////    strArray = new string*();
+//    strArray = (string**)malloc(2*sizeof(string*));
+//    Name = new string(strName);
+//    Sex = new string(strSex);
+//    strArray[0] = Name;
+//    strArray[1] = Sex;
+//    p->recptr[0]=Name;
+//    p->recptr[1]=Sex;
+//    return true;
+//}
+//---------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------
+/*
+*void insertKey(BPTreeNode* p,int j,int k,BPTreeNode* ap)
+*Created by 赵桐 on 2020年 8月11日 星期二 16时59分15秒 CST
+*把关键码k插入到p的key[j+1]的位置，需要先把后面的移动一个然后再插入
+*同理也是把ap插入到p的ptr[j+1]的位置
+*/
+void insertKey(BPTreeNode* p,int j,int k,BPTreeNode* ap,StuDate * pstu){
 //    int i,x=p->n;
 ////    for(i=0;i<(p->n)-j;i++){
 ////        p->key[x+1]=p->key[x];
@@ -106,6 +149,7 @@ void insertKey(BPTreeNode* p,int j,int k,BPTreeNode* ap){
     for(int i=p->n;i>=j;i--){
         p->key[i+1]=p->key[i];
         p->ptr[i]=p->ptr[i-1];
+        p->recptr[i]=p->recptr[i-1];
     }
 //    int u=p->n-1;
 //    for(i=u;i>=j;i--){
@@ -113,6 +157,7 @@ void insertKey(BPTreeNode* p,int j,int k,BPTreeNode* ap){
 //    }
     p->key[j+1]=k;
     p->ptr[j]=ap;
+    p->recptr[j]=pstu;
     p->n++;
 }
 //---------------------------------------------------------------------------------
@@ -130,6 +175,7 @@ void move(BPTreeNode*p,BPTreeNode*q,int s,int x ){
     for(i=0;i<s+1;i++){
         q->key[i+1]=p->key[j];
         q->ptr[i]=p->ptr[j-1];
+        q->recptr[i]=p->recptr[j-1];
         j++;
     }
 //    i=0;
@@ -140,6 +186,7 @@ void move(BPTreeNode*p,BPTreeNode*q,int s,int x ){
 //    }
 //    t->ptr[i+1]=q;
     q->ptr[i]=p->ptr[j-1];
+    q->recptr[i]=p->recptr[j-1];
     p->n=s+1;
     q->n=x-s;
     
@@ -153,32 +200,39 @@ void move(BPTreeNode*p,BPTreeNode*q,int s,int x ){
 *然后把分裂形成的p，q子节点的最大值添加进父节点
 */
 //---------------------------------------------------------------------------------
-bool BPTree::Insert(const int&x){
+bool BPTree::Insert(const int& x , StuDate stu){
     
     Triple loc = Search(x);
     if(!loc.tag)return false;//先搜索如果有就不用插入
     BPTreeNode *p =loc.r,*q;
     BPTreeNode *ap=NULL,*t;
+    StuDate * pstu;
+    //    strArray = new string*();
+    pstu = new StuDate(stu);
+    
     if(loc.r==NULL){
         sqt = root=new BPTreeNode();
-        insertKey(root, 0, x, ap);
+        insertKey(root, 0, x, ap,pstu);
+        root->recptr[0]=pstu;
         return true;
     }
-
-    int k=x,j=loc.i,k1,i=0;
+        
+    
+//    int k=x,j=loc.i,i=0;
+      int k=x,j=loc.i,k1,i=0;
     //k是要插入的关键码，j是插入的位置，k1是存储原来p的最大值（用来判断是否刷新父树上的p的最大值），i用来遍历
     //如果节电p的个数小于m那么可以直接插入，但是需要判断，插入的是不是这个分组中最大的数，
     //如果是最大的数且有父节点，那么需要把父节点相应的之前p节点最大的数换成现在p节电最大的数
     while(1){
     if(p->n<m){
         if(k<p->key[p->n]||p->parent==NULL)
-        insertKey(p, j, k, ap);
+        insertKey(p, j, k, ap ,pstu);
         else{
-            k1=p->key[p->n];
-            insertKey(p, j, k, ap);
-            i=1;
-            while(p->parent->key[i]!=k1)i++;//定位到父节点相应的与之前p中最大值相等的位置，换成现在p中的最大值
-            p->parent->key[i]=k;
+//            k1=p->key[p->n];
+            insertKey(p, j, k, ap,pstu);
+            i=0;
+            while(p->parent->ptr[i]!=p)i++;//定位到父节点相应的与之前p中最大值相等的位置，换成现在p中的最大值
+            p->parent->key[i+1]=k;
             
         }
         return true;
@@ -186,7 +240,7 @@ bool BPTree::Insert(const int&x){
     
     int s=(m+1)/2;
     k1=p->key[p->n];   //k1存储现在插入分裂前的时候的p的最大值
-    insertKey(p, j, k, ap);
+    insertKey(p, j, k, ap,pstu);
     q=new BPTreeNode();
         
     q->right=p->right;
@@ -205,7 +259,7 @@ bool BPTree::Insert(const int&x){
 //            t->ptr[j+1]=t->ptr[j];
 //        }
 //        t->ptr[i+1]=q;
-        i=j=0;
+        i=j=1;
         while(t->key[i]!=k1)i++;
         t->key[i]=k;
         //找到与之前p的最大key值相等的key，并且替换成现在p中最大的值
@@ -322,6 +376,7 @@ Triple BPTree::Search(const int &x)
 void compress(BPTreeNode* p , int j){
     for(int i=p->n;i>j;i--){
         p->key[i-1]=p->key[i];          //从删除的位置往前搬
+        p->key[i-2]=p->key[i-1];
     }
     p->n--;                             //删除了就把原来的关键码的个数减少一个
 }
@@ -344,6 +399,7 @@ void LeftAdjust(BPTreeNode* p,BPTreeNode *q,int d, int j){
         int i=0;
         for(i=1;i<=pl->n;i++){       //这个循环把右节点的数据传送到左节点
             p->key[p->n+1]=pl->key[i];
+            p->recptr[p->n]=pl->recptr[i-1];
             p->n++;
             }
             p->right = pl->right;
@@ -362,12 +418,14 @@ void LeftAdjust(BPTreeNode* p,BPTreeNode *q,int d, int j){
         int k=d;
         for(int i=0;i<=d-1;i++){        //移动部分数据到左节点
             p->key[k++]=pl->key[i+1];
+            p->recptr[k-2]=pl->recptr[i];
             p->n++;
         }
 
         k=1;
-        for(int i=d+1;i<=pl->n;i++){    //把后面的数据挪到前面去形成平衡素好
+        for(int i=d+1;i<=pl->n;i++){    //把后面的数据挪到前面去形成平衡树
             pl->key[k++]=pl->key[i];
+            pl->recptr[k-2]=pl->recptr[i-1];
         }
         pl->n=d;
         q->key[j+1]=p->key[p->n];       //把父节点上左节点的最大值改成现在的最大值
@@ -390,38 +448,42 @@ void RightAdjust(BPTreeNode* p,BPTreeNode *q,int d, int j){
     temp=pl;
     pl=p;
     p=temp;
-       if((pl->n+p->n)<=m){
-
-                int i=0;
-                for(i=1;i<=pl->n;i++){
-                    p->key[p->n+1]=pl->key[i];
-                    p->n++;
-                    }
-                    p->right = pl->right;
-                for(int i=j+1;i<q->n;i++){
-                    q->key[i]=q->key[i+1];
-                    q->ptr[i]=q->ptr[i+1];
-                }
-                q->key[j+1]=p->key[p->n];
-                q->n--;
+    if((pl->n+p->n)<=m){
+                                   //如果p的关键码的个数与pl的关键码的个数加起来小于等于m那么直接合并
+           int i=0;
+           for(i=1;i<=pl->n;i++){       //这个循环把右节点的数据传送到左节点
+               p->key[p->n+1]=pl->key[i];
+               p->recptr[p->n]=pl->recptr[i-1];
+               p->n++;
+               }
+               p->right = pl->right;
+           for(int i=j+1;i<q->n;i++){     //这个循环把父节点上面的p q合并为一个
+               q->key[i]=q->key[i+1];
+               q->ptr[i]=q->ptr[i+1];
+           }
+           q->key[j+1]=p->key[p->n];
+           q->n--;
            delete pl;
-            }
-            else{
+       }
+       else{
+                                           //如果此节点跟右边的节点大于1，就需要把右边节点的部分数据
+                                           //移动到左节点宏观上实现，“先合并再分裂”微观实现其实只需要
+                                           //移动右节点部分数据，然后把后面的数据挪到前面去
+           int k=d;
+           for(int i=0;i<=d-1;i++){        //移动部分数据到左节点
+               p->key[k++]=pl->key[i+1];
+               p->recptr[k-2]=pl->recptr[i];
+               p->n++;
+           }
 
-                int k=d;
-                for(int i=0;i<=d-1;i++){
-                    p->key[k++]=pl->key[i+1];
-                    p->n++;
-                }
-
-                k=1;
-                for(int i=d+1;i<=pl->n;i++){
-                    pl->key[k++]=pl->key[i];
-                }
-                
-                pl->n=d;
-                q->key[j+1]=p->key[p->n];
-            }
+           k=1;
+           for(int i=d+1;i<=pl->n;i++){    //把后面的数据挪到前面去形成平衡树
+               pl->key[k++]=pl->key[i];
+               pl->recptr[k-2]=pl->recptr[i-1];
+           }
+           pl->n=d;
+           q->key[j+1]=p->key[p->n];       //把父节点上左节点的最大值改成现在的最大值
+       }
 }
 //---------------------------------------------------------------------------------
 /*
