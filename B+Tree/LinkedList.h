@@ -16,24 +16,19 @@
 #include <string>
 #include <cstring>
 #include <unistd.h>
-
+#include "B+Tree.h"
 using namespace std;
-struct StuDate2{
-{
-    int key;
-    string name;
-    string sex;
-    Set(int key,string name , string sex){
-        this->key=key;
-        this->name=name;
-        this->sex=sex;
-    }
 
-};
 struct LinkNode
-{
-    student data;
+{   int key;
+    StuDate data;
     struct LinkNode *link;
+    LinkNode(){
+        this->key=-1;
+        data.strName="";
+        data.strSex="";
+        link=NULL;
+    }
 };
 
 class List
@@ -46,32 +41,53 @@ public:
         last=first=new LinkNode;
     }
 
-    LinkNode*Search(int x);//搜索结构体中key是x的元素
+    bool Search(int x);//搜索结构体中key是x的元素
     bool Remove(int i);
-    LinkNode*Insert(student a);
+   bool Insert(int key,StuDate a);
     void traverse_list();
+    bool ceshi(int x);
 
 };
-LinkNode*List::Search(int x)
+bool List::Search(int x)
 {
 
     LinkNode*current=first->link;
     while(current!=NULL)
     {
-        if(current->data.key==x)
+        if(current->key==x)
         {
-            cout<<current->data.name<<" "<<current->data.sex;
-            break;
+            cout<<"链表已含有key:"<<x<<" "<<current->data.strName<<" "<<current->data.strSex<<endl;
+             return true;
         }
         else
             current=current->link;
     }
-    
+    return false;
+
 }
-bool List:: Insert(student a)
+bool List::ceshi(int x)
 {
 
-    LinkNode*pNew;
+    LinkNode*current=first->link;
+    while(current!=NULL)
+    {
+        if(current->key==x)
+        {
+
+             return true;
+        }
+        else
+            current=current->link;
+    }
+    return false;
+
+}
+bool List:: Insert(int keys,StuDate a)
+{
+    StuDate stu(a);
+    if(first->link==NULL)
+  {
+     LinkNode*pNew;
 
     pNew = (LinkNode*) malloc(sizeof(LinkNode));
     if(pNew == NULL)
@@ -79,12 +95,36 @@ bool List:: Insert(student a)
         cout<<"内存分配失败，程序终止"<<endl;
         exit(-1);
     }
-
-    pNew->data = a;
+    pNew->key=keys;
+    pNew->data = stu;
     last->link = pNew;
     last = pNew;
     last->link = NULL;
+  }
+   else
+    {
+    if(ceshi(keys))
+  {
+    return false;
+  }
+   else{
+  LinkNode*pNew;
+
+    pNew = (LinkNode*) malloc(sizeof(LinkNode));
+    if(pNew == NULL)
+    {
+        cout<<"内存分配失败，程序终止"<<endl;
+        exit(-1);
+    }
+    pNew->key=keys;
+    pNew->data = stu;
+    last->link = pNew;
+    last = pNew;
+    last->link = NULL;
+    }
+    }
     return true;
+
 }
 void List::traverse_list()
 {
@@ -93,7 +133,7 @@ void List::traverse_list()
     while(p != NULL)
     {
 
-        cout<<p->data.key<<" "<<p->data.name<<" "<<p->data.sex<<endl;
+        cout<<p->key<<" "<<p->data.strName<<" "<<p->data.strSex<<endl;
         p = p->link;
     }
 
@@ -105,7 +145,7 @@ bool List::Remove(int i)
         return false;
     while(current!=NULL)
     {
-        if(current->data.key==i)
+        if(current->key==i)
         {
             LinkNode*p=current;
             current=p->link;
@@ -115,8 +155,8 @@ bool List::Remove(int i)
         current=current->link;
     }
     return true;
-}
 
+}
 
 
 #endif

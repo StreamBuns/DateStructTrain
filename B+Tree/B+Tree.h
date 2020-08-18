@@ -38,6 +38,12 @@ struct StuDate{
         this->strName="";
         this->strSex ="";
     }
+//    StuDate &operator = (StuDate &L){
+////        StuDate temp;
+//        this->strName=L.strName;
+//        this->strSex=L.strSex;
+//        return *this;
+//    }
 };
 /*
  *子节点的数据结构
@@ -374,25 +380,26 @@ void LeftAdjust(BPTreeNode* p,BPTreeNode *q,int d, int j){
             p->right = pl->right;
         for(int i=j+1;i<q->n;i++){     //这个循环把父节点上面的p q合并为一个
             q->key[i]=q->key[i+1];
-            q->ptr[i-1]=q->ptr[i];
+            q->ptr[i]=q->ptr[i+1];
         }
         q->key[j+1]=p->key[p->n];
         q->n--;
-//        delete p;
+//        delete pl;
     }
     else{
                                         //如果此节点跟右边的节点大于1，就需要把右边节点的部分数据
                                         //移动到左节点宏观上实现，“先合并再分裂”微观实现其实只需要
                                         //移动右节点部分数据，然后把后面的数据挪到前面去
-        int k=d;
-        for(int i=0;i<=d-1;i++){        //移动部分数据到左节点
-            p->key[k++]=pl->key[i+1];
-            p->recptr[k-2]=pl->recptr[i];
+        int k=0;
+        for(int i=0;i<m-d;i++){        //移动部分数据到左节点
+            p->key[p->n+1]=pl->key[i+1];
+            p->recptr[p->n]=pl->recptr[i];
             p->n++;
+            k++;
         }
 
         k=1;
-        for(int i=d+1;i<=pl->n;i++){    //把后面的数据挪到前面去形成平衡树
+        for(int i=m-d+1;i<=pl->n;i++){    //把后面的数据挪到前面去形成平衡树
             pl->key[k++]=pl->key[i];
             pl->recptr[k-2]=pl->recptr[i-1];
         }
@@ -417,42 +424,44 @@ void RightAdjust(BPTreeNode* p,BPTreeNode *q,int d, int j){
     temp=pl;
     pl=p;
     p=temp;
-    if((pl->n+p->n)<=m){
-                                   //如果p的关键码的个数与pl的关键码的个数加起来小于等于m那么直接合并
-           int i=0;
-           for(i=1;i<=pl->n;i++){       //这个循环把右节点的数据传送到左节点
-               p->key[p->n+1]=pl->key[i];
-               p->recptr[p->n]=pl->recptr[i-1];
-               p->n++;
-               }
-               p->right = pl->right;
-           for(int i=j+1;i<q->n;i++){     //这个循环把父节点上面的p q合并为一个
-               q->key[i]=q->key[i+1];
-               q->ptr[i]=q->ptr[i+1];
-           }
-           q->key[j+1]=p->key[p->n];
-           q->n--;
-           delete pl;
-       }
-       else{
-                                           //如果此节点跟右边的节点大于1，就需要把右边节点的部分数据
-                                           //移动到左节点宏观上实现，“先合并再分裂”微观实现其实只需要
-                                           //移动右节点部分数据，然后把后面的数据挪到前面去
-           int k=d;
-           for(int i=0;i<=d-1;i++){        //移动部分数据到左节点
-               p->key[k++]=pl->key[i+1];
-               p->recptr[k-2]=pl->recptr[i];
-               p->n++;
-           }
+   if((pl->n+p->n)<=m){
+                                    //如果p的关键码的个数与pl的关键码的个数加起来小于等于m那么直接合并
+            int i=0;
+            for(i=1;i<=pl->n;i++){       //这个循环把右节点的数据传送到左节点
+                p->key[p->n+1]=pl->key[i];
+                p->recptr[p->n]=pl->recptr[i-1];
+                p->ptr[p->n]=pl->ptr[i-1];
+                p->n++;
+                }
+                p->right = pl->right;
+            for(int i=j+1;i<q->n;i++){     //这个循环把父节点上面的p q合并为一个
+                q->key[i]=q->key[i+1];
+                q->ptr[i]=q->ptr[i+1];
+            }
+            q->key[j+1]=p->key[p->n];
+            q->n--;
+    //        delete pl;
+        }
+        else{
+                                            //如果此节点跟右边的节点大于1，就需要把右边节点的部分数据
+                                            //移动到左节点宏观上实现，“先合并再分裂”微观实现其实只需要
+                                            //移动右节点部分数据，然后把后面的数据挪到前面去
+            int k=0;
+            for(int i=0;i<m-d;i++){        //移动部分数据到左节点
+                p->key[p->n+1]=pl->key[i+1];
+                p->recptr[p->n]=pl->recptr[i];
+                p->n++;
+                k++;
+            }
 
-           k=1;
-           for(int i=d+1;i<=pl->n;i++){    //把后面的数据挪到前面去形成平衡树
-               pl->key[k++]=pl->key[i];
-               pl->recptr[k-2]=pl->recptr[i-1];
-           }
-           pl->n=d;
-           q->key[j+1]=p->key[p->n];       //把父节点上左节点的最大值改成现在的最大值
-       }
+            k=1;
+            for(int i=m-d+1;i<=pl->n;i++){    //把后面的数据挪到前面去形成平衡树
+                pl->key[k++]=pl->key[i];
+                pl->recptr[k-2]=pl->recptr[i-1];
+            }
+            pl->n=d;
+            q->key[j+1]=p->key[p->n];       //把父节点上左节点的最大值改成现在的最大值
+        }
 }
 //---------------------------------------------------------------------------------
 /*
@@ -485,11 +494,12 @@ bool BPTree::Remove(const int&x){
     while(1){                           //如果个数小余d那就从下面叶节点循环往上面更改
         if(p->n<d){
             j=0;q=p->parent;
+            if(p==root)break;
 //            GetNode(q);
             while(j<=q->n&&q->ptr[j]!=p)j++;
             if(j==0)LeftAdjust( p, q, d, j);       //如果是最左边的子孩子就与右边的孩子调整
             else RightAdjust( p, q, d, j);          //如果不是最左边的孩子，就与左边的孩子进行调整
-            p=q;
+            p=p->parent;
             if(p==root)break;
         }
         else break;
