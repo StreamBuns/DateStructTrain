@@ -11,13 +11,21 @@
 
 
 #define MaxValue 2000000
-#define m 201
+#define m 4
+#include <stdio.h>
+#include <stdlib.h>
+#include <fstream>
+#include <string>
+#include <cstring>
+ #include <unistd.h>
+#include<ctime>
 #include <iostream>
 using namespace std;
 
 struct StuDate{
     string strName;
     string strSex;
+    
     void Set(string strName,string strSex){
         this->strName=strName;
         this->strSex = strSex;
@@ -333,9 +341,10 @@ Triple BPTree::Search(const int &x)
 */
 //---------------------------------------------------------------------------------
 void compress(BPTreeNode* p , int j){
-    for(int i=p->n;i>j;i--){
-        p->key[i-1]=p->key[i];          //从删除的位置往前搬
-        p->key[i-2]=p->key[i-1];
+    for(int i=j;i<p->n;i++){
+        p->key[i]=p->key[i+1];          //从删除的位置往前搬
+        p->ptr[i-1]=p->ptr[i];
+        p->recptr[i-1]=p->recptr[i];
     }
     p->n--;                             //删除了就把原来的关键码的个数减少一个
 }
@@ -359,16 +368,17 @@ void LeftAdjust(BPTreeNode* p,BPTreeNode *q,int d, int j){
         for(i=1;i<=pl->n;i++){       //这个循环把右节点的数据传送到左节点
             p->key[p->n+1]=pl->key[i];
             p->recptr[p->n]=pl->recptr[i-1];
+            p->ptr[p->n]=pl->ptr[i-1];
             p->n++;
             }
             p->right = pl->right;
         for(int i=j+1;i<q->n;i++){     //这个循环把父节点上面的p q合并为一个
             q->key[i]=q->key[i+1];
-            q->ptr[i]=q->ptr[i+1];
+            q->ptr[i-1]=q->ptr[i];
         }
         q->key[j+1]=p->key[p->n];
         q->n--;
-        delete pl;
+//        delete p;
     }
     else{
                                         //如果此节点跟右边的节点大于1，就需要把右边节点的部分数据
