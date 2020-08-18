@@ -30,31 +30,44 @@ int main(int argc, const char * argv[]) {
         cout<<"数据文件打开错误"<<endl;
         exit(1);
     }
-//    int i=1000;
-//    startB=clock();
-////    gittimeofday();
-//    while (!infile.eof()) {
-//        infile>>key>>strName>>sex;
-//        stu.Set(strName, sex);
-//        bp->Insert(key,stu);
+    int i=1000;
+    startB=clock();
+//    gittimeofday();
+    while (!infile.eof()) {
+        infile>>key>>strName>>sex;
+        stu.Set(strName, sex);
+        bp->Insert(key,stu);
+
+    }
+    endB=clock();
+
+    infile.clear();
+    startList=clock();
+    infile.seekg(0,ios::beg);
+    i=1000;
+        while (!infile.eof()&&i>=0) {
+            infile>>key>>strName>>sex;
+//            bp->Search(key);r
+            key=rand()%100000;
+            bp->Remove(key);i--;
+        }
+    endList=clock();
+    infile.close();
+
+//    for(i=100;i<=100000;i+=100)
+//    {
+//
+//        int temp=i;
+//        startB=clock();
+//        while (!infile.eof()&&temp>0) {
+//                infile>>key>>strName>>sex;
+//                stu.Set(strName, sex);
+//                bp->Insert(key,stu);
+//            temp--;
+//            }
+//        endB=clock();
 //
 //    }
-//    endB=clock();
-//
-//    infile.clear();
-//    startList=clock();
-//    infile.seekg(0,ios::beg);
-//    i=1000;
-//        while (!infile.eof()&&i>=0) {
-//            infile>>key>>strName>>sex;
-////            bp->Search(key);
-//            key=rand()%100000;
-//            bp->Remove(key);i--;
-//        }
-//    endList=clock();
-//    infile.close();
-
-
 //       bp->Travelsal();
     cout<<"B+over\n";
 //    infile.clear();
