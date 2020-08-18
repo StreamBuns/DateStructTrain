@@ -41,12 +41,12 @@
 int main()
 {      FILE* fd;
 
-       fd=fopen("./date.txt","a+");
+       fd=fopen("./test.txt","a+");
        char*surname[]={"赵","钱","孙","李","周","吴","郑","王","冯","陈","褚","卫","蒋","沈","韩","杨"};
        char *lastname[]={"管波","新竹","信阳","与寻","沈","龙藏","云新","自汉","景雷","自旋","与泽","瑞军","家文","晓明","一番","佳凝","玉飞","子龙"};
        char *gender[]={"男","女"};
        srand((int)time(0));
-     int i=100000;
+     int i=10;
 
       while(i>0)
 {    int z=rand()%16;
@@ -55,7 +55,7 @@ int main()
       char*s=surname[z];
       char*v=lastname[x];
       char*m=gender[b];
-        fprintf(fd,"%d %s%s %s\n",rand()%100000,s,v,m);
+        fprintf(fd,"%d %s%s %s\n",rand()%10,s,v,m);
         i--;
 }
 }

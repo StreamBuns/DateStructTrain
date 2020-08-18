@@ -30,17 +30,28 @@ int main(int argc, const char * argv[]) {
         cout<<"数据文件打开错误"<<endl;
         exit(1);
     }
-    int i=100000;
+    int i=1000;
     while (!infile.eof()) {
         infile>>key>>strName>>sex;
         stu.Set(strName, sex);
         bp->Insert(key,stu);
-        sleep(0.01);
+        
+//        sleep(0.01);
     }
-    
-    bp->Travelsal();
+////    infile.seekg(0,ios::beg);
+////        while (!infile.eof()) {
+////            infile>>key>>strName>>sex;
+////            bp->Search(key);
+//////            stu.Set(strName, sex);
+//////            bp->Insert(key,stu);
+////    //        sleep(0.01);
+////        }
+    infile.close();
+//
+//    bp->Insert(<#const int &x#>, <#StuDate stu#>)
+       bp->Travelsal();
 
 
-    std::cout << "Hello, World!\n";
+    std::cout << "Hello, World!\n"<<sizeof(BPTreeNode);
     return 0;
 }

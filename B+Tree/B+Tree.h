@@ -11,7 +11,7 @@
 
 
 #define MaxValue 2000000
-#define m 199
+#define m 201
 #include <iostream>
 using namespace std;
 
@@ -76,8 +76,7 @@ class BPTree
 private:
     BPTreeNode * root;//根指针
     BPTreeNode * sqt;
-    Triple Search(const int& x);//搜索
-    BPTreeNode* Insert(const int& x);//插入关键码x
+
 
 public:
     BPTree(){
@@ -86,17 +85,8 @@ public:
     };//构造函数
     bool Insert(const int& x , StuDate stu);
     bool Remove(const int& x);//删除关键码x
+    Triple Search(const int& x);//搜索
     void Travelsal(){
-//        BPTreeNode * q = root,*p;
-//        int i = 0;
-//        p=q;
-//        while(p!=NULL){
-//        while(p->key[(p->n)<MaxValue]){
-//            cout<<p->key[(p->n)]<<endl;
-//            break;
-//        }
-//            p=q->ptr[i++];
-//      }
         BPTreeNode * p = sqt;
         int i=0;
         while(p!=NULL){
@@ -107,30 +97,7 @@ public:
     
     }
 };//用来测试插入成功与否
-//---------------------------------------------------------------------------------
-/*
-*void insertKey(BPTreeNode* p,int j,int k,BPTreeNode* ap)
-*Created by 赵桐 on 2020年 8月11日 星期二 16时59分15秒 CST
-*把关键码k插入到p的key[j+1]的位置，需要先把后面的移动一个然后再插入
-*同理也是把ap插入到p的ptr[j+1]的位置
-*/
-//bool BPTree::Insert(const int& x , string strName,string strSex){
-//    BPTreeNode *p = Insert(x);
-//    if(p==NULL){
-//        return false;
-//    }
-//    string  *Name,*Sex,**strArray = nullptr;
-////    strArray = new string*();
-//    strArray = (string**)malloc(2*sizeof(string*));
-//    Name = new string(strName);
-//    Sex = new string(strSex);
-//    strArray[0] = Name;
-//    strArray[1] = Sex;
-//    p->recptr[0]=Name;
-//    p->recptr[1]=Sex;
-//    return true;
-//}
-//---------------------------------------------------------------------------------
+
 //---------------------------------------------------------------------------------
 /*
 *void insertKey(BPTreeNode* p,int j,int k,BPTreeNode* ap)
@@ -139,22 +106,13 @@ public:
 *同理也是把ap插入到p的ptr[j+1]的位置
 */
 void insertKey(BPTreeNode* p,int j,int k,BPTreeNode* ap,StuDate * pstu){
-//    int i,x=p->n;
-////    for(i=0;i<(p->n)-j;i++){
-////        p->key[x+1]=p->key[x];
-//////        p->ptr[x+1]=p->ptr[x];
-////        x--;
-////    }
-//    int o=;
-    for(int i=p->n;i>=j;i--){
+
+    for(int i=p->n;i>j;i--){
         p->key[i+1]=p->key[i];
         p->ptr[i]=p->ptr[i-1];
         p->recptr[i]=p->recptr[i-1];
     }
-//    int u=p->n-1;
-//    for(i=u;i>=j;i--){
-//        p->ptr[i+1]=p->ptr[i];
-//    }
+
     p->key[j+1]=k;
     p->ptr[j]=ap;
     p->recptr[j]=pstu;
@@ -171,10 +129,13 @@ void insertKey(BPTreeNode* p,int j,int k,BPTreeNode* ap,StuDate * pstu){
 */
 //---------------------------------------------------------------------------------
 void move(BPTreeNode*p,BPTreeNode*q,int s,int x ){
-    int i=0,j=s+2;
-    for(i=0;i<s+1;i++){
+    int i=0,j=p->n-s+1;
+    for(i=0;i<s;i++){
         q->key[i+1]=p->key[j];
         q->ptr[i]=p->ptr[j-1];
+        if(q->ptr[i]!=NULL&&q->ptr[i]->parent!=NULL){
+        q->ptr[i]->parent=q;
+        }
         q->recptr[i]=p->recptr[j-1];
         j++;
     }
@@ -187,8 +148,8 @@ void move(BPTreeNode*p,BPTreeNode*q,int s,int x ){
 //    t->ptr[i+1]=q;
     q->ptr[i]=p->ptr[j-1];
     q->recptr[i]=p->recptr[j-1];
-    p->n=s+1;
-    q->n=x-s;
+    p->n=p->n-s;
+    q->n=s;
     
 }
 //---------------------------------------------------------------------------------
@@ -231,9 +192,12 @@ bool BPTree::Insert(const int& x , StuDate stu){
 //            k1=p->key[p->n];
             insertKey(p, j, k, ap,pstu);
             i=0;
+            while(p->parent!=NULL){
             while(p->parent->ptr[i]!=p)i++;//定位到父节点相应的与之前p中最大值相等的位置，换成现在p中的最大值
-            p->parent->key[i+1]=k;
-            
+                p->parent->key[i+1]=p->key[p->n];
+                p=p->parent;
+                i=0;
+            }
         }
         return true;
     }
@@ -253,20 +217,21 @@ bool BPTree::Insert(const int& x , StuDate stu){
     ap=q;
     if(p->parent!=NULL){
 
-        i=0;t=p->parent;
+        t=p->parent;
 //        while(t->ptr[i]!=p)i++;
 //        for(j=t->n-1;j>=i;j--){
 //            t->ptr[j+1]=t->ptr[j];
 //        }
 //        t->ptr[i+1]=q;
-        i=j=1;
-        while(t->key[i]!=k1)i++;
-        t->key[i]=k;
+        i=j=0;
+        while(t->ptr[i]!=p)i++;
+        t->key[i+1]=k;
         //找到与之前p的最大key值相等的key，并且替换成现在p中最大的值
-        while(t->key[j+1]<k1)j++;
+//        while(t->key[j+1]<k1)j++;
+        j=i+1;
         //找到现在的q的最大key值要插入的地方
         q->parent=p->parent;
-        k=k1;
+        k=q->key[q->n];
         p=t;
     }
     else{                                      //第一次没有父节点，创建一个父节点然后把pq加进去
@@ -301,13 +266,7 @@ bool BPTree::Insert(const int& x , StuDate stu){
 Triple BPTree::Search(const int &x)
 {
     Triple result;
-    //GetNode(root);
-    //    if(x==90){
-    //        result.i=3;
-    //        result.r=root->ptr[2];
-    //        result.tag=1;
-    //        return result;
-    //    }
+
     BPTreeNode *p = root, *q = NULL;
     int i = 0;
     while (p != NULL)
