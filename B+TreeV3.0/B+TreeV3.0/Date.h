@@ -228,6 +228,9 @@ bool StudentTable::insertData(Student &st)
         return false;
     }
     assert(fileIn);
+    Triple loc=bptree->Search(st.sno);
+    if(!loc.tag)return true;
+    else{
     st.diff = locate;
     // fileIn.seekp(SEEK_SET); //将文件定位到文件尾部
     // cout << "插入文件末尾为 "<<fileIn.tellp() << endl;
@@ -235,7 +238,7 @@ bool StudentTable::insertData(Student &st)
     fileIn.write((char *)&st, sizeof(Student));
     fileIn.close();
     locate += sizeof(Student);
-    bptree->Insert(st.sno,locate-sizeof(Student));
+    bptree->Insert(st.sno,locate-sizeof(Student),loc);
     //----------------------------------------------------------------
     /*
     *bptree.insert(st.sno,locate-sizeof(Student));
@@ -246,6 +249,7 @@ bool StudentTable::insertData(Student &st)
     */
     //----------------------------------------------------------------
     cout << "偏移量为 " << locate << endl;
+    }
     return true;
 }
 

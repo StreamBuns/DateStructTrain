@@ -139,10 +139,9 @@ public:
         fileOut.read((char *)&root, sizeof(int));
         fileOut.read((char *)&sqt, sizeof(int));
         fileOut.close();
-        
     }
     Triple Search(const int &x);                //搜索
-    bool Insert(const int &x, const int &diff); //插入关键码x,并将数据在数据库数据文件中的头偏移量存入到recptr[];
+    bool Insert(const int &x, const int &diff,Triple loc); //插入关键码x,并将数据在数据库数据文件中的头偏移量存入到recptr[];
     bool Remove(const int &x);                  //删除关键码x
     void Travelsal(){
         BPTreeNode temp;
@@ -342,10 +341,10 @@ void BPTree::move(BPTreeNode& p,BPTreeNode& q,int s,int x,int qd){
 *然后把分裂形成的p，q子节点的最大值添加进父节点
 */
 //---------------------------------------------------------------------------------
-bool BPTree::Insert(const int &x, const int &diff){
-    Triple loc = Search(x);
-    if (!loc.tag)
-        return false;
+bool BPTree::Insert(const int &x, const int &diff,Triple loc){
+//    Triple loc = Search(x);
+//    if (!loc.tag)
+//        return false;
     
     BPTreeNode p,q,pp,teststruct;
     BPTreeNode t;
