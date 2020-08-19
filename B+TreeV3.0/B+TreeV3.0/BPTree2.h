@@ -110,8 +110,18 @@ public:
     {
         // root = NULL;
         // sqt = NULL;
+        
         filePath = "";
         size = 0;
+        ifstream fileOut;                                                  //文件输出流
+        fileOut.open("/Users/zhaotong/C++Program/DSTrain/B+TreeV3.0/data/mydb/student.r", ios::binary | ios::out |ios::in);//用文件打开模式 ios::in，这样可以保证文件内容不会被清空，且文件指针偏移操作有效。
+        if(!fileOut.is_open()) {
+            cout<<"打开目录文件错误"<<endl;
+        }
+        fileOut.seekg(0);
+        fileOut.read((char *)&root, sizeof(int));
+        fileOut.read((char *)&sqt, sizeof(int));
+        fileOut.close();
 //        root = 
     }; //无参构造函数
     BPTree(string &_filePath)
@@ -120,6 +130,16 @@ public:
         // sqt = NULL;
         filePath = _filePath;
         size = 0;
+        ifstream fileOut;                                                  //文件输出流
+        fileOut.open("/Users/zhaotong/C++Program/DSTrain/B+TreeV3.0/data/mydb/student.r", ios::binary | ios::out |ios::in);//用文件打开模式 ios::in，这样可以保证文件内容不会被清空，且文件指针偏移操作有效。
+        if(!fileOut.is_open()) {
+            cout<<"打开目录文件错误"<<endl;
+        }
+        fileOut.seekg(0);
+        fileOut.read((char *)&root, sizeof(int));
+        fileOut.read((char *)&sqt, sizeof(int));
+        fileOut.close();
+        
     }
     Triple Search(const int &x);                //搜索
     bool Insert(const int &x, const int &diff); //插入关键码x,并将数据在数据库数据文件中的头偏移量存入到recptr[];
@@ -137,7 +157,7 @@ public:
     bool GetNode(BPTreeNode &bpn, int pidff); //从数据库数据文件里读入节点bpn，需要已知节点偏移量
     int PutNode(BPTreeNode &bpn); //从数据库文件中在末尾添加节点，返回该节点的偏移量
     bool ModifyNode(BPTreeNode &bpn, int pidff);//在文件原位置修改节点数据
-    bool ModifyRoot(int diff);
+    bool ModifyRootSqt(int tag,int diff);
     void move(BPTreeNode& p,BPTreeNode& q,int s,int x,int qd);//用于分配分裂形成的子节点的数据。
 };
 
@@ -341,9 +361,10 @@ bool BPTree::Insert(const int &x, const int &diff){
             p.recptr[0]=pstu;
             p.partentDiff=-1;
             p.n++;
-//            i=;
+
         sqt=root=PutNode(p);
-        ModifyRoot(root);
+        ModifyRootSqt(1,root);
+        ModifyRootSqt(0,sqt);
         return true;
     }
     GetNode(p,pd);
@@ -410,7 +431,7 @@ bool BPTree::Insert(const int &x, const int &diff){
                 root=p.partentDiff=q.partentDiff=PutNode(t);
      
                                         
-                ModifyRoot(root);                                  //修改父节点后把父节点“指针”更新到新的文件
+                ModifyRootSqt(1, root);                                  //修改父节点后把父节点“指针”更新到新的文件
                 return true;
             }
         }
@@ -427,13 +448,21 @@ bool BPTree::ModifyNode(BPTreeNode &bpn,int diff){
     fileIn.close();
     return true;
 }
-bool BPTree::ModifyRoot(int diff){
+bool BPTree::ModifyRootSqt(int tag,int diff){
     ofstream fileIn;                                                  //文件输出流
-    fileIn.open("/Users/zhaotong/C++Program/DSTrain/B+TreeV3.0/date/mydb/student.r", ios::binary | ios::out |ios::in);//用文件打开模式 ios::in，这样可以保证文件内容不会被清空，且文件指针偏移操作有效。
+    fileIn.open("/Users/zhaotong/C++Program/DSTrain/B+TreeV3.0/data/mydb/student.r", ios::binary | ios::out |ios::in);//用文件打开模式 ios::in，这样可以保证文件内容不会被清空，且文件指针偏移操作有效。
     if(!fileIn.is_open()) return false;
+    if(tag){
     fileIn.seekp(0);
     fileIn.write((char *)&diff,sizeof(int));
     fileIn.close();
+    return true;
+    }else{
+        fileIn.seekp(root);
+        fileIn.write((char*)&diff, sizeof(int));
+        fileIn.close();
+        return true;
+    }
     return true;
 }
 
