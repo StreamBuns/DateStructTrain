@@ -134,7 +134,7 @@ void insertKey(BPTreeNode* p,int j,int k,BPTreeNode* ap,StuDate * pstu){
 }
 //---------------------------------------------------------------------------------
 /*
-*void move(BPTreeNode*p,BPTreeNode*q,int s,int x )分裂函数
+*void move(BPTreeNode*p,BPTreeNode*q,int s,int x )分裂分配函数
 *Created by 赵桐 on 2020年 8月11日 星期二 16时59分15秒 CST
 *把p的右指针指向新分裂出来的q
 *把p的key[s+2,m+1]移动到q的key[1,s]
@@ -147,7 +147,7 @@ void move(BPTreeNode*p,BPTreeNode*q,int s,int x ){
     for(i=0;i<s;i++){
         q->key[i+1]=p->key[j];
         q->ptr[i]=p->ptr[j-1];
-        if(q->ptr[i]!=NULL&&q->ptr[i]->parent!=NULL){
+        if(q->ptr[i]!=NULL){
         q->ptr[i]->parent=q;
         }
         q->recptr[i]=p->recptr[j-1];
@@ -232,11 +232,7 @@ bool BPTree::Insert(const int& x , StuDate stu){
     if(p->parent!=NULL){
 
         t=p->parent;
-//        while(t->ptr[i]!=p)i++;
-//        for(j=t->n-1;j>=i;j--){
-//            t->ptr[j+1]=t->ptr[j];
-//        }
-//        t->ptr[i+1]=q;
+
         i=j=0;
         while(t->ptr[i]!=p)i++;
         t->key[i+1]=k;

@@ -9,7 +9,7 @@
 #include <iostream>
 #include "B+Tree.h"
 //#include "LinkedList.h"
-#include "LinkedList2.h"
+#include "LinkedList.h"
 int main(int argc, const char * argv[]) {
     // insert code here...
     BPTree * bp = new BPTree();
@@ -41,18 +41,18 @@ int main(int argc, const char * argv[]) {
     }
     endB=clock();
 
-    infile.clear();
-    startList=clock();
-    infile.seekg(0,ios::beg);
-    i=1000;
-        while (!infile.eof()&&i>=0) {
-            infile>>key>>strName>>sex;
-//            bp->Search(key);r
-            key=rand()%100000;
-            bp->Remove(key);i--;
-        }
-    endList=clock();
-    infile.close();
+//    infile.clear();
+//    startList=clock();
+//    infile.seekg(0,ios::beg);
+//    i=1000;
+//        while (!infile.eof()&&i>=0) {
+//            infile>>key>>strName>>sex;
+////            bp->Search(key);r
+//            key=rand()%100000;
+//            bp->Remove(key);i--;
+//        }
+//    endList=clock();
+//    infile.close();
 
 //    for(i=100;i<=100000;i+=100)
 //    {
@@ -68,16 +68,16 @@ int main(int argc, const char * argv[]) {
 //        endB=clock();
 //
 //    }
-//       bp->Travelsal();
-    cout<<"B+over\n";
-//    infile.clear();
-    while (!infile.eof())
-      {
-          infile>>key>>strName>>sex;
-          stu.Set(strName,sex);
-          list.Insert(key,stu);
-      }
-    list.output();
+       bp->Travelsal();
+//    cout<<"B+over\n";
+////    infile.clear();
+//    while (!infile.eof())
+//      {
+//          infile>>key>>strName>>sex;
+//          stu.Set(strName,sex);
+//          list.Insert(key,stu);
+//      }
+//    list.output();
 //    list.traverse_list();
 
     std::cout << "Hello, World!\n"<<(double)(startB-endB)/CLOCKS_PER_SEC<<(double)(startList-endList)/CLOCKS_PER_SEC;
