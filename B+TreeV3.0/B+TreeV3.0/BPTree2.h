@@ -120,6 +120,7 @@ public:
         }
         fileOut.seekg(0);
         fileOut.read((char *)&root, sizeof(int));
+        fileOut.seekg(sizeof(int));
         fileOut.read((char *)&sqt, sizeof(int));
         fileOut.close();
 //        root = 
@@ -137,6 +138,7 @@ public:
         }
         fileOut.seekg(0);
         fileOut.read((char *)&root, sizeof(int));
+        fileOut.seekg(sizeof(int));
         fileOut.read((char *)&sqt, sizeof(int));
         fileOut.close();
     }
@@ -457,7 +459,7 @@ bool BPTree::ModifyRootSqt(int tag,int diff){
     fileIn.close();
     return true;
     }else{
-        fileIn.seekp(root);
+        fileIn.seekp(sizeof(int));
         fileIn.write((char*)&diff, sizeof(int));
         fileIn.close();
         return true;
