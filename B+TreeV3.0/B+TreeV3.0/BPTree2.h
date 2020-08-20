@@ -254,10 +254,15 @@ Triple BPTree::Search(const int &x)
                 return result;
             }
         }
-
+        if(i!=0){
         if (p.ptrDiff[i-1] == -1)
         {
             break;
+        }
+        }else{
+            if(p.ptrDiff[i]==-1)
+                i++;
+                break;
         }
         if (i == p.n)
         {

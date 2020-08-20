@@ -205,7 +205,7 @@ int StudentTable::insertData(string fileName)
     {
         /* code */
         fileOut >> st_temp.sno >> st_temp.sname >> st_temp.ssex; //将数据文件按行读入
-        cout << st_temp.sno << st_temp.sname << st_temp.ssex << endl;
+//        cout << st_temp.sno << st_temp.sname << st_temp.ssex << endl;
         if (insertData(st_temp))
         {
             i++;
