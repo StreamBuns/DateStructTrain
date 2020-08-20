@@ -204,17 +204,17 @@ Triple BPTree::Search(const int &x)
 
     // GetNode(root, 0); //从索引文件中获取偏移量为0的root,使root节点常驻内存
     // cout << root.key[1] << endl;
-    BPTreeNode p,q;
-    GetNode(p,root);
+    BPTreeNode p, q;
+    GetNode(p, root);
     int resultDiff = 0;
     int i = 0;
     while (1)
     {
         /* code */
         i = 0;
-        cout <<"search的p key为"<<p.key[1]<<endl;
+        //cout <<"search的p key为"<<p.key[1]<<endl;
         p.key[p.n + 1] = MaxValue;
-        if(p.n == 0)
+        if (p.n == 0)
         {
             resultDiff = -1;
             break;
@@ -255,7 +255,7 @@ Triple BPTree::Search(const int &x)
             }
         }
 
-        if (p.ptrDiff[i] == -1)
+        if (p.ptrDiff[i-1] == -1)
         {
             break;
         }
@@ -379,6 +379,7 @@ bool BPTree::Insert(const int &x, const int &diff,Triple loc){
             }
             else{
                 insertKey(p, j, k, ap,pstu);
+                ModifyNode(p, pd);
                 i=0;
                 while(p.partentDiff!=-1){
                 GetNode(t, p.partentDiff);
@@ -386,6 +387,9 @@ bool BPTree::Insert(const int &x, const int &diff,Triple loc){
                     //定位到父节点相应的与之前p中最大值相等的位置，换成现在p中的最大值
                 t.key[i+1]=p.key[p.n];
                 ModifyNode(t, p.partentDiff);
+                pd=p.partentDiff;
+                GetNode(p, p.partentDiff);
+//                pd=p.partentDiff;
                 i=0;
                 }
                 ModifyNode(p, pd);
@@ -418,8 +422,9 @@ bool BPTree::Insert(const int &x, const int &diff,Triple loc){
         ModifyNode(t, p.partentDiff);
         ModifyNode(q, qd);
         k=q.key[q.n];
-        p=t;
         pd=p.partentDiff;
+        p=t;
+        
     }
             else{                                      //第一次没有父节点，创建一个父节点然后把pq加进去
 //                root = new BPTreeNode();
@@ -430,7 +435,9 @@ bool BPTree::Insert(const int &x, const int &diff,Triple loc){
                 t.key[1]=p.key[p.n];t.key[2]=q.key[q.n];     //把子树的两个最大值整进去
                 t.ptrDiff[0]=pd;t.ptrDiff[1]=qd;       //把子节点连接到p，和新分裂的q
                 root=p.partentDiff=q.partentDiff=PutNode(t);
-     
+                
+                ModifyNode(p, pd);
+                ModifyNode(q, qd);
                                         
                 ModifyRootSqt(1, root);                                  //修改父节点后把父节点“指针”更新到新的文件
                 return true;

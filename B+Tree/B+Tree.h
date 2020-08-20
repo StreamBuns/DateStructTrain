@@ -11,14 +11,14 @@
 
 
 #define MaxValue 2000000
-#define m 4
+#define m 100
 #include <stdio.h>
 #include <stdlib.h>
 #include <fstream>
 #include <string>
 #include <cstring>
  #include <unistd.h>
-#include<ctime>
+#include <ctime>
 #include <iostream>
 using namespace std;
 
@@ -284,7 +284,9 @@ Triple BPTree::Search(const int &x)
         i = 0;
 
         //        cout <<p->n << " ";
+        if(p->n>0&&p->n<=m){
         p->key[p->n + 1] = MaxValue;
+        }else break;
         //将Key值最大的后一个Key值设为MaxValue
         //        {
         //            i++;
@@ -298,6 +300,7 @@ Triple BPTree::Search(const int &x)
                 p = p->ptr[i];
                 while (p != NULL)
                 {
+                    if(!(p->n>0)&&(p->n<=m))break;
                     result.r = p;
                     i = p->n;             //更新i使其等于n
                     p = p->ptr[p->n - 1]; //如果在非叶子节点找到等于x的key值
@@ -374,13 +377,14 @@ void LeftAdjust(BPTreeNode* p,BPTreeNode *q,int d, int j){
             p->n++;
             }
             p->right = pl->right;
+            pl->right=NULL;
         for(int i=j+1;i<q->n;i++){     //这个循环把父节点上面的p q合并为一个
             q->key[i]=q->key[i+1];
             q->ptr[i]=q->ptr[i+1];
         }
         q->key[j+1]=p->key[p->n];
         q->n--;
-//        delete pl;
+        delete pl;
     }
     else{
                                         //如果此节点跟右边的节点大于1，就需要把右边节点的部分数据
@@ -430,13 +434,14 @@ void RightAdjust(BPTreeNode* p,BPTreeNode *q,int d, int j){
                 p->n++;
                 }
                 p->right = pl->right;
+                pl->right=NULL;
             for(int i=j+1;i<q->n;i++){     //这个循环把父节点上面的p q合并为一个
                 q->key[i]=q->key[i+1];
                 q->ptr[i]=q->ptr[i+1];
             }
             q->key[j+1]=p->key[p->n];
             q->n--;
-    //        delete pl;
+            delete pl;
         }
         else{
                                             //如果此节点跟右边的节点大于1，就需要把右边节点的部分数据

@@ -19,8 +19,8 @@ int main(int argc, const char * argv[]) {
     List<StuDate> list;
 //    StuDate2 stu2;
     StuDate stu;
-    clock_t startB = 0,endB = 0,startList,endList = 0;
-    struct timeval start_B,end_b;
+//    clock_t startB = 0,endB = 0,startList,endList = 0;
+//    struct timeval start_B,end_b;
     srand((unsigned)time(NULL));
  
 
@@ -31,7 +31,7 @@ int main(int argc, const char * argv[]) {
         exit(1);
     }
     int i=1000;
-    startB=clock();
+//    startB=clock();
 //    gittimeofday();
     while (!infile.eof()) {
         infile>>key>>strName>>sex;
@@ -39,18 +39,18 @@ int main(int argc, const char * argv[]) {
         bp->Insert(key,stu);
 
     }
-    endB=clock();
+//    endB=clock();
 
-//    infile.clear();
+    infile.clear();
 //    startList=clock();
-//    infile.seekg(0,ios::beg);
-//    i=1000;
-//        while (!infile.eof()&&i>=0) {
-//            infile>>key>>strName>>sex;
-////            bp->Search(key);r
-//            key=rand()%100000;
-//            bp->Remove(key);i--;
-//        }
+    infile.seekg(0,ios::beg);
+    i=1000;
+        while (!infile.eof()&&i>=0) {
+            infile>>key>>strName>>sex;
+//            bp->Search(key);r
+//            key=rand()%10000;
+            bp->Remove(key);i--;
+        }
 //    endList=clock();
 //    infile.close();
 
@@ -79,7 +79,7 @@ int main(int argc, const char * argv[]) {
 //      }
 //    list.output();
 //    list.traverse_list();
-
-    std::cout << "Hello, World!\n"<<(double)(startB-endB)/CLOCKS_PER_SEC<<(double)(startList-endList)/CLOCKS_PER_SEC;
+    cout<<"遍历完成"<<endl;
+//    std::cout << "Hello, World!\n"<<(double)(startB-endB)/CLOCKS_PER_SEC<<(double)(startList-endList)/CLOCKS_PER_SEC;
     return 0;
 }

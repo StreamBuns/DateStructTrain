@@ -229,7 +229,7 @@ bool StudentTable::insertData(Student &st)
     }
     assert(fileIn);
     Triple loc=bptree->Search(st.sno);
-    if(!loc.tag)return true;
+    if(!loc.tag)return false;
     else{
     st.diff = locate;
     // fileIn.seekp(SEEK_SET); //将文件定位到文件尾部

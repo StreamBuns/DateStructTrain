@@ -16,7 +16,7 @@
 using namespace std;
 #ifndef INSMOD_INF_INR
 #define INSMOD_INF_INR
-enum InsMod {INF, INR};//∂®“ÂœÚ«∞ªπ «œÚ∫Û…˙≥…
+enum InsMod {INF, INR};
 #endif
 template <typename T>struct LinkNode{
     int key;
@@ -37,11 +37,11 @@ public:
     List(){
         first = new LinkNode<T>;
     }
-    List(const T &x){//Õ∑Ω·µ„÷–ø…∑≈Ãÿ ‚–≈œ¢
+    List(const T &x){
         first = new LinkNode<T>(x);
     }
     List(List<T> &L);
-    ~List(){//∏ƒ
+    ~List(){
         makeEmpty();
         delete first;
     }
@@ -199,7 +199,7 @@ template <typename T> void List<T>::output(){
 template <typename T> List<T> &List<T>::operator = (List<T> &L){//∏ƒ
     T value;
     LinkNode<T> *destptr=first,*srcptr = L.first;
-    makeEmpty();//œ»«Âø’£¨∫Û∏¥÷∆
+    makeEmpty();
     while (srcptr->link)
     {
         value = srcptr->link->data;
