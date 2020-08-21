@@ -27,7 +27,7 @@ using namespace std;
 
 int main(int argc, const char * argv[]) {
     string dbName = "mydb";
-    string fileName = "data1.txt";
+    string fileName = "data.txt";
     //string tableName = "student.t";
     DataBase *db = new DataBase(dbName);
     StudentTable *st = new StudentTable();

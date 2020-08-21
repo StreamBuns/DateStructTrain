@@ -261,7 +261,7 @@ Triple BPTree::Search(const int &x)
         }
         }else{
             if(p.ptrDiff[i]==-1)
-                i++;
+//                i++;
                 break;
         }
         if (i == p.n)
@@ -374,7 +374,7 @@ bool BPTree::Insert(const int &x, const int &diff,Triple loc){
         return true;
     }
     GetNode(p,pd);
-    GetNode(teststruct, root);
+//    GetNode(teststruct, root);
     while(1){
         if(p.n<m){
             if(k<p.key[p.n]||p.partentDiff==-1)

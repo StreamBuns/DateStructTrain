@@ -11,7 +11,7 @@
 
 
 #define MaxValue 2000000
-#define m 100
+#define m 4
 #include <stdio.h>
 #include <stdlib.h>
 #include <fstream>
@@ -415,33 +415,34 @@ void LeftAdjust(BPTreeNode* p,BPTreeNode *q,int d, int j){
 *
 *原理与最左边的子树调整类似，不过是左右互换。
 *这个p不是必定不是q的ptr[0]所以只要整一个pl=p的左边节点
-*然后pl与p互换就能复用最左树调整的代码
+*然后pl与p互换就能复用大部分最左树调整的代码
 *
 */
 //---------------------------------------------------------------------------------
 void RightAdjust(BPTreeNode* p,BPTreeNode *q,int d, int j){
-    BPTreeNode * pl = q->ptr[j-1],*temp;
-    temp=pl;
-    pl=p;
-    p=temp;
+    BPTreeNode * pl = q->ptr[j-1];
+//    temp=pl;
+//    pl=p;
+//    p=temp;
    if((pl->n+p->n)<=m){
                                     //如果p的关键码的个数与pl的关键码的个数加起来小于等于m那么直接合并
             int i=0;
-            for(i=1;i<=pl->n;i++){       //这个循环把右节点的数据传送到左节点
-                p->key[p->n+1]=pl->key[i];
-                p->recptr[p->n]=pl->recptr[i-1];
-                p->ptr[p->n]=pl->ptr[i-1];
-                p->n++;
+            for(i=1;i<=p->n;i++){       //这个循环把右节点的数据传送到左节点
+                pl->key[pl->n+1]=p->key[i];
+                pl->recptr[pl->n]=p->recptr[i-1];
+                pl->ptr[pl->n]=p->ptr[i-1];
+                pl->n++;
                 }
-                p->right = pl->right;
-                pl->right=NULL;
+                pl->right = p->right;
+                p->right=NULL;
+//       for(int i=0;i<p->key)
             for(int i=j+1;i<q->n;i++){     //这个循环把父节点上面的p q合并为一个
                 q->key[i]=q->key[i+1];
-                q->ptr[i]=q->ptr[i+1];
+                q->ptr[i-1]=q->ptr[i];
             }
-            q->key[j+1]=p->key[p->n];
+            q->key[j]=pl->key[pl->n];
             q->n--;
-            delete pl;
+            delete p;
         }
         else{
                                             //如果此节点跟右边的节点大于1，就需要把右边节点的部分数据
@@ -449,19 +450,20 @@ void RightAdjust(BPTreeNode* p,BPTreeNode *q,int d, int j){
                                             //移动右节点部分数据，然后把后面的数据挪到前面去
             int k=0;
             for(int i=0;i<m-d;i++){        //移动部分数据到左节点
-                p->key[p->n+1]=pl->key[i+1];
-                p->recptr[p->n]=pl->recptr[i];
+                p->key[p->n+1]=p->key[p->n];
+                p->key[p->n]=pl->key[pl->n-d+(i+1)];
+                p->recptr[p->n-1]=pl->recptr[pl->n-d+(i+1)-1];
                 p->n++;
                 k++;
             }
 
-            k=1;
-            for(int i=m-d+1;i<=pl->n;i++){    //把后面的数据挪到前面去形成平衡树
-                pl->key[k++]=pl->key[i];
-                pl->recptr[k-2]=pl->recptr[i-1];
-            }
+//            k=1;
+//            for(int i=m-d+1;i<=pl->n;i++){    //把后面的数据挪到前面去形成平衡树
+//                pl->key[k++]=pl->key[i];
+//                pl->recptr[k-2]=pl->recptr[i-1];
+//            }
             pl->n=d;
-            q->key[j+1]=p->key[p->n];       //把父节点上左节点的最大值改成现在的最大值
+            q->key[j]=pl->key[pl->n];       //把父节点上左节点的最大值改成现在的最大值
         }
 }
 //---------------------------------------------------------------------------------
